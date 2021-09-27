@@ -11,3 +11,5 @@ class Settings:
 
         self.gravitational_acceleration = -9.8
         self.delta_t = 0.1
+
+        self.game_clock = 60

@@ -18,6 +18,12 @@ class Rocket:
         self.positon[1] = self.positon[1] + self.velocity[1] * self.settings.delta_t + (self.settings.gravitational_acceleration + self.thrust / self.settings.rocket_mass) * self.settings.delta_t ** 2 / 2
         # print(self.velocity, "   ", self.positon)
 
+    def save_step_to_file(self):
+        file = open("logs.elo", "a")
+        file.write(self.velocity[0]+","+self.velocity[1]+";"+self.positon[0]+","+self.positon[1]+"\n")
+        file.close()
+
+
 class Display:
     def __init__(self):
         self.settings = Settings()
@@ -41,11 +47,12 @@ class Display:
                 if event.type == pygame.QUIT:
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
-                    pass
-                if event.key == pygame.K_w:
-                    self.up_engine()
-                elif event.key == pygame.K_s:
-                    self.down_engine()
+                    if event.key == pygame.K_w:
+                        self.up_engine()
+                    elif event.key == pygame.K_s:
+                        self.down_engine()
+
+            self.clock.tick(self.settings.game_clock)
 
 
 
