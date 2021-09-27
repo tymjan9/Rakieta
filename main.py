@@ -67,7 +67,7 @@ class Display:
 
             self.screen.fill([0,255,255])
             self.screen.blit(self.rocket_sprites[0], [595, 350])
-            # self.screen.blit(self.settings.game_font.render(self.rocket.positon, (0,0,0)), 1000, 100)
+            self.screen.blit(self.settings.game_font.render((str(round(self.rocket.positon[0],2)) + " " + str(round(self.rocket.positon[1],2))), True, (0,0,0)), [900, 10])
 
 
             pygame.display.update()
