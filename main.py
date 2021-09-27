@@ -31,9 +31,9 @@ class Rocket:
             self.acceleration[0] = math.sin(self.rotation + 360) * self.thrust / self.settings.rocket_mass
 
         if self.rotation >= 0:
-            self.acceleration[1] = math.cos(self.rotation) * self.thrust / self.settings.rocket_mass
+            self.acceleration[1] = math.cos(self.rotation) * self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
         else:
-            self.acceleration[1] = math.cos(self.rotation + 360) * self.thrust / self.settings.rocket_mass
+            self.acceleration[1] = math.cos(self.rotation + 360) * self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
         print(self.acceleration)
 
         # self.acceleration[0] = 0
