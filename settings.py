@@ -12,8 +12,9 @@ class Settings:
         self.rocket_start_velocity = [0,0]
 
         self.gravitational_acceleration = -9.8
-        self.delta_t = 0.1
+        self.delta_t = 0.02
 
-        self.game_clock = 10
+        self.game_clock = 50
         # self.game_font = pygame.font.Font("Fonts/Penisfont.ttf", 50)
-        self.game_font = pygame.font.Font(pygame.font.get_default_font(), 50)
+        self.game_font_30 = pygame.font.Font(pygame.font.get_default_font(), 30)
+        self.game_font_15 = pygame.font.Font(pygame.font.get_default_font(), 15)
