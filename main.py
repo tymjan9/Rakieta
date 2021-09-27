@@ -1,4 +1,4 @@
-import pygame, os, sys, json, socket
+import pygame, os, sys, json, socket, math
 from settings import Settings
 
 
@@ -10,22 +10,40 @@ class Rocket:
         self.acceleration = [0, 0]
         self.velocity = self.settings.rocket_start_velocity
         self.positon = self.settings.rocket_start_postition
-        self.rotation = 0
-
         self.thrust = 0
+
+        self.rotational_acceleration = 0
+        self.rotational_speed = 0
+        self.rotation = 0
+        self.torque = 0
 
 
     def symulate_next_step(self):
-        self.acceleration[0] = 0
-        self.acceleration[1] = self.settings.gravitational_acceleration + self.thrust / self.settings.rocket_mass
+        self.rotational_acceleration = self.torque / self.settings.rocket_mass
 
+        self.rotational_speed = self.rotational_speed + self.rotational_acceleration * self.settings.delta_t
+
+        self.rotation = self.rotation + self.rotational_speed * self.settings.delta_t + self.rotational_acceleration * self.settings.delta_t**2 / 2
+
+        if self.rotation >= 0:
+            self.acceleration[0] = math.sin(self.rotation) * self.thrust / self.settings.rocket_mass
+        else:
+            self.acceleration[0] = math.sin(self.rotation + 360) * self.thrust / self.settings.rocket_mass
+
+        if self.rotation >= 0:
+            self.acceleration[1] = math.cos(self.rotation) * self.thrust / self.settings.rocket_mass
+        else:
+            self.acceleration[1] = math.cos(self.rotation + 360) * self.thrust / self.settings.rocket_mass
+        print(self.acceleration)
+
+        # self.acceleration[0] = 0
+        # self.acceleration[1] = self.settings.gravitational_acceleration + self.thrust / self.settings.rocket_mass
 
         self.velocity[0] = self.velocity[0] + self.acceleration[0] * self.settings.delta_t
         self.velocity[1] = self.velocity[1] + self.acceleration[1] * self.settings.delta_t
 
         self.positon[0] = self.positon[0] + self.velocity[0] * self.settings.delta_t + self.acceleration[0] * self.settings.delta_t**2 / 2
         self.positon[1] = self.positon[1] + self.velocity[1] * self.settings.delta_t + self.acceleration[1] * self.settings.delta_t ** 2 / 2
-        # print(self.velocity, "   ", self.positon)
 
         if self.positon[1] < 0:
             if self.acceleration[1] < 0:
@@ -34,6 +52,7 @@ class Rocket:
                 self.velocity[1] = 0
             if self.positon[1] < 0:
                 self.positon[1] = 0
+
 
     def save_step_to_file(self):
         file = open("logs.elo", "a")
@@ -49,13 +68,17 @@ class Display:
 
         pygame.init()
         self.clock = pygame.time.Clock()
+        pygame.display.set_caption("Rocket_landing_simulation")
         self.screen = pygame.display.set_mode((1200, 800))
         self.screen_rect = self.screen.get_rect()
+
+        # self.game_font = pygame.font.Font("Fonts/Penisfont.ttf", 50)
+        self.game_font_30 = pygame.font.Font(pygame.font.get_default_font(), 30)
+        self.game_font_15 = pygame.font.Font(pygame.font.get_default_font(), 15)
+
         self.ground_sprite = pygame.transform.scale(pygame.image.load("images/Ground.png"), (10000,600))
-        self.rocket_sprite = pygame.transform.scale(pygame.image.load("images/Rocket.png"), (10, 100))
-        self.rocket_sprite.set_colorkey((0,255,255))
-        self.fire_sprite = pygame.transform.scale(pygame.image.load("images/fire.png"), (10, 20))
-        self.fire_sprite.set_colorkey((255,255,255))
+        self.rocket_sprite = pygame.transform.scale(pygame.image.load("images/Rocket.png"), (10, 120))
+        self.rocket_fire_sprite = pygame.transform.scale(pygame.image.load("images/Rocket_fire.png"), (10, 120))
 
 
         self.time = 0
@@ -66,7 +89,7 @@ class Display:
 
         run = True
         while run:
-
+            self.rocket.torque = 0
             keys = pygame.key.get_pressed()
             if keys[pygame.K_ESCAPE]:
                 run = False
@@ -74,10 +97,13 @@ class Display:
                 self.up_engine()
             if keys[pygame.K_s]:
                 self.down_engine()
+            if keys[pygame.K_a]:
+                self.rotation_left()
+            if keys[pygame.K_d]:
+                self.rotation_right()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
-
 
 
             self.rocket.symulate_next_step()
@@ -85,15 +111,23 @@ class Display:
             # print(self.rocket.positon)
 
             self.screen.fill([0,255,255])
-            self.screen.blit(self.ground_sprite, [600, 450 + self.rocket.positon[1]])
-            self.screen.blit(self.ground_sprite, [-9400, 450 + self.rocket.positon[1]])
-            self.screen.blit(self.rocket_sprite, [595, 350])
+            self.screen.blit(self.ground_sprite, [600-self.rocket.positon[0], 450 + self.rocket.positon[1]])
+            self.screen.blit(self.ground_sprite, [-9400-self.rocket.positon[0], 450 + self.rocket.positon[1]])
+            x, y = 595, 410
             if self.rocket.thrust > 0:
-                self.screen.blit(self.fire_sprite, [595, 450])
-            self.screen.blit(self.settings.game_font_30.render("Positon: " + (str(round(self.rocket.positon[0],2)) + "m  " + str(round(self.rocket.positon[1],2))) + "m", True, (0,0,0)), [10, 10])
-            self.screen.blit(self.settings.game_font_30.render("Velocity: " + (str(round(self.rocket.velocity[0], 2)) + "m/s  " + str(round(self.rocket.velocity[1], 2))) + "m/s", True, (0, 0, 0)), [10, 50])
-            self.screen.blit(self.settings.game_font_30.render("Thrust: " + str(int(self.rocket.thrust/1000)) + "KN", True, (0, 0, 0)), [10, 90])
-            self.screen.blit(self.settings.game_font_30.render(f"Time: {self.time}s", True, (0,0,0)), [10, 130])
+                rocket = pygame.transform.rotate(self.rocket_fire_sprite, -self.rocket.rotation)
+
+            else:
+                rocket = pygame.transform.rotate(self.rocket_sprite, -self.rocket.rotation)
+            rocket.set_colorkey((0, 0, 255))
+            rocket_rect = rocket.get_rect()
+            rocket_rect.center = x, y
+            self.screen.blit(rocket, rocket_rect)
+            self.screen.blit(self.game_font_30.render("Positon: " + (str(round(self.rocket.positon[0],2)) + "m  " + str(round(self.rocket.positon[1],2))) + "m", True, (0,0,0)), [10, 10])
+            self.screen.blit(self.game_font_30.render("Velocity: " + (str(round(self.rocket.velocity[0], 2)) + "m/s  " + str(round(self.rocket.velocity[1], 2))) + "m/s", True, (0, 0, 0)), [10, 50])
+            self.screen.blit(self.game_font_30.render("Thrust: " + str(int(self.rocket.thrust/1000)) + "KN", True, (0, 0, 0)), [10, 90])
+            self.screen.blit(self.game_font_30.render("Rotation: " + str(round(self.rocket.rotation, 2)), True, (0, 0, 0)), [10, 130])
+            self.screen.blit(self.game_font_30.render(f"Time: {self.time}s", True, (0,0,0)), [10, 170])
 
             pygame.display.update()
             self.clock.tick(self.settings.game_clock)
@@ -108,6 +142,14 @@ class Display:
     def down_engine(self):
         if self.rocket.thrust > 0:
             self.rocket.thrust = self.rocket.thrust - self.settings.rocket_max_thrust / 100
+
+    def rotation_right(self):
+        self.rocket.torque = self.settings.rocket_max_torque
+
+    def rotation_left(self):
+        self.rocket.torque = self.settings.rocket_max_torque * -1
+
+
 
 
 
