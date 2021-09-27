@@ -11,41 +11,53 @@ class Rocket:
 
 
     def symulate_next_step(self):
-
-
         self.velocity[0] = self.velocity[0] + 0 * self.settings.delta_t
         self.velocity[1] = self.velocity[1] + (self.settings.gravitational_acceleration + self.thrust / self.settings.rocket_mass) * self.settings.delta_t
 
         self.positon[0] = self.positon[0] + self.velocity[0] * self.settings.delta_t + 0 * self.settings.delta_t**2 / 2
         self.positon[1] = self.positon[1] + self.velocity[1] * self.settings.delta_t + (self.settings.gravitational_acceleration + self.thrust / self.settings.rocket_mass) * self.settings.delta_t ** 2 / 2
-
         # print(self.velocity, "   ", self.positon)
 
-    def _check_events(self):
-         for event in pygame.event.get(): 
-            if event.type == pygame.QUIT:
-                sys.exit()
-            elif event.type == pygame.KEYDOWN:
-         #       if event.key == pygame.K_d:
-           #         self.right_engine()
-          #      elif event.key == pygame.K_a:
-          #          self.left_engine()
+class Display:
+    def __init__(self):
+        self.settings = Settings()
+        self.rocket = Rocket()
+
+        pygame.init()
+        self.clock = pygame.time.Clock()
+        self.screen = pygame.display.set_mode((1200, 800))
+        self.screen_rect = self.screen.get_rect()
+
+
+        self.run_game()
+
+
+
+    def run_game(self):
+
+        run = True
+        while run:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    pass
                 if event.key == pygame.K_w:
                     self.up_engine()
                 elif event.key == pygame.K_s:
                     self.down_engine()
-                    
-   # def right_engine(self):
-        
-        
-   # def left_engine(self):
+
+
+
+
+
         
         
     def up_engine(self):
-        
+        pass
         
     def down_engine(self):
-                    
+        pass
 
 
 
