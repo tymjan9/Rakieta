@@ -25,16 +25,15 @@ class Rocket:
 
         self.rotation = self.rotation + self.rotational_speed * self.settings.delta_t + self.rotational_acceleration * self.settings.delta_t**2 / 2
 
-        if self.rotation >= 0:
-            self.acceleration[0] = math.sin(self.rotation) * self.thrust / self.settings.rocket_mass
-        else:
-            self.acceleration[0] = math.sin(self.rotation + 360) * self.thrust / self.settings.rocket_mass
+        if self.rotation > 360:
+            self.rotation = self.rotation - 360
+        if self.rotation < -0:
+            self.rotation = 360 - self.rotation
 
-        if self.rotation >= 0:
-            self.acceleration[1] = math.cos(self.rotation) * self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
-        else:
-            self.acceleration[1] = math.cos(self.rotation + 360) * self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
-        print(self.acceleration)
+
+        self.acceleration[0] = math.sin(self.rotation) * self.thrust / self.settings.rocket_mass
+
+        self.acceleration[1] = math.cos(self.rotation) * self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
 
         # self.acceleration[0] = 0
         # self.acceleration[1] = self.settings.gravitational_acceleration + self.thrust / self.settings.rocket_mass
@@ -108,7 +107,7 @@ class Display:
 
             self.rocket.symulate_next_step()
             self.rocket.save_step_to_file()
-            # print(self.rocket.positon)
+            print(self.rocket.acceleration)
 
             self.screen.fill([0,255,255])
             self.screen.blit(self.ground_sprite, [600-self.rocket.positon[0], 450 + self.rocket.positon[1]])
