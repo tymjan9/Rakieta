@@ -18,6 +18,12 @@ class Rocket:
         self.positon[1] = self.positon[1] + self.velocity[1] * self.settings.delta_t + (self.settings.gravitational_acceleration + self.thrust / self.settings.rocket_mass) * self.settings.delta_t ** 2 / 2
         # print(self.velocity, "   ", self.positon)
 
+    def save_step_to_file(self):
+        file = open("logs.elo", "a")
+        file.write(self.velocity[0]+","+self.velocity[1]+";"+self.positon[0]+","+self.positon[1]+"\n")
+        file.close()
+
+
 class Display:
     def __init__(self):
         self.settings = Settings()
@@ -55,6 +61,10 @@ class Display:
             self.screen.blit(self.rocket_sprites[0], [600, 400])
             
             pygame.display.update()
+
+
+            self.clock.tick(self.settings.game_clock)
+
 
 
 
