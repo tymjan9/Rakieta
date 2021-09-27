@@ -27,6 +27,10 @@ class Display:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((1200, 800))
         self.screen_rect = self.screen.get_rect()
+        self.rocket_sprites = [ pygame.image.load('images/Rocket.bmp') ]
+
+        
+
 
 
         self.run_game()
@@ -37,17 +41,20 @@ class Display:
 
         run = True
         while run:
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
-                    pass
-                if event.key == pygame.K_w:
-                    self.up_engine()
-                elif event.key == pygame.K_s:
-                    self.down_engine()
-
-
+                    if event.key == pygame.K_w:
+                        self.up_engine()
+                    elif event.key == pygame.K_s:
+                        self.down_engine()
+            
+            self.screen.fill([0,255,255])
+            self.screen.blit(self.rocket_sprites[0], [600, 400])
+            
+            pygame.display.update()
 
 
 
@@ -63,6 +70,5 @@ class Display:
 
 
 if __name__ == '__main__':
-    rocket = Rocket()
-    for i in range(100):
-        rocket.symulate_next_step()
+    display = Display()
+    display.run_game
