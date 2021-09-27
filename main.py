@@ -17,7 +17,31 @@ class Rocket:
 
         print(self.velocity)
 
-
+    def _check_events(self):
+         for event in pygame.event.get(): 
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+         #       if event.key == pygame.K_d:
+           #         self.right_engine()
+          #      elif event.key == pygame.K_a:
+          #          self.left_engine()
+                if event.key == pygame.K_w:
+                    self.up_engine()
+                elif event.key == pygame.K_s:
+                    self.down_engine()
+                    
+   # def right_engine(self):
+        
+        
+   # def left_engine(self):
+        
+        
+    def up_engine(self):
+        
+        
+    def down_engine(self):
+                    
 
 
 
