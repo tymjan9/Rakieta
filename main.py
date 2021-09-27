@@ -10,6 +10,7 @@ class Rocket:
         self.acceleration = [0, 0]
         self.velocity = self.settings.rocket_start_velocity
         self.positon = self.settings.rocket_start_postition
+        self.rotation = 0
 
         self.thrust = 0
 
@@ -50,8 +51,12 @@ class Display:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((1200, 800))
         self.screen_rect = self.screen.get_rect()
-        self.ground_sprite = pygame.transform.scale(pygame.image.load("images/Ground.png"), (1200,1000))
-        self.rocket_sprites = pygame.transform.scale(pygame.image.load("images/Rocket.png"), (10, 100))
+        self.ground_sprite = pygame.transform.scale(pygame.image.load("images/Ground.png"), (10000,600))
+        self.rocket_sprite = pygame.transform.scale(pygame.image.load("images/Rocket.png"), (10, 100))
+        self.rocket_sprite.set_colorkey((0,255,255))
+        self.fire_sprite = pygame.transform.scale(pygame.image.load("images/fire.png"), (10, 20))
+        self.fire_sprite.set_colorkey((255,255,255))
+
 
         self.time = 0
 
@@ -80,8 +85,11 @@ class Display:
             # print(self.rocket.positon)
 
             self.screen.fill([0,255,255])
-            self.screen.blit(self.ground_sprite, [0, 450+self.rocket.positon[1]])
-            self.screen.blit(self.rocket_sprites, [595, 350])
+            self.screen.blit(self.ground_sprite, [600, 450 + self.rocket.positon[1]])
+            self.screen.blit(self.ground_sprite, [-9400, 450 + self.rocket.positon[1]])
+            self.screen.blit(self.rocket_sprite, [595, 350])
+            if self.rocket.thrust > 0:
+                self.screen.blit(self.fire_sprite, [595, 450])
             self.screen.blit(self.settings.game_font_30.render("Positon: " + (str(round(self.rocket.positon[0],2)) + "m  " + str(round(self.rocket.positon[1],2))) + "m", True, (0,0,0)), [10, 10])
             self.screen.blit(self.settings.game_font_30.render("Velocity: " + (str(round(self.rocket.velocity[0], 2)) + "m/s  " + str(round(self.rocket.velocity[1], 2))) + "m/s", True, (0, 0, 0)), [10, 50])
             self.screen.blit(self.settings.game_font_30.render("Thrust: " + str(int(self.rocket.thrust/1000)) + "KN", True, (0, 0, 0)), [10, 90])
