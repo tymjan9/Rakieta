@@ -1,6 +1,8 @@
 import pygame, os, sys, json, socket
 from settings import Settings
 
+
+
 class Rocket:
     def __init__(self):
         self.settings = Settings()
@@ -20,8 +22,9 @@ class Rocket:
 
     def save_step_to_file(self):
         file = open("logs.elo", "a")
-        file.write(self.velocity[0]+","+self.velocity[1]+";"+self.positon[0]+","+self.positon[1]+"\n")
+        file.write(f"{self.velocity[0]},{self.velocity[1]};{self.positon[0]},{self.positon[1]}\n")
         file.close()
+
 
 
 class Display:
@@ -56,17 +59,19 @@ class Display:
                         self.up_engine()
                     elif event.key == pygame.K_s:
                         self.down_engine()
-            
+
+
+            self.rocket.symulate_next_step()
+            self.rocket.save_step_to_file()
+            print(self.rocket.positon)
+
             self.screen.fill([0,255,255])
-            self.screen.blit(self.rocket_sprites[0], [600, 400])
-            
+            self.screen.blit(self.rocket_sprites[0], [595, 350])
+            # self.screen.blit(self.settings.game_font.render(self.rocket.positon, (0,0,0)), 1000, 100)
+
+
             pygame.display.update()
-
-
             self.clock.tick(self.settings.game_clock)
-
-
-
 
         
         
@@ -80,5 +85,9 @@ class Display:
 
 
 if __name__ == '__main__':
+    try:
+        os.remove("logs.elo")
+    except:
+        pass
     display = Display()
     display.run_game

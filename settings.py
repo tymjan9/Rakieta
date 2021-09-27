@@ -13,3 +13,4 @@ class Settings:
         self.delta_t = 0.1
 
         self.game_clock = 60
+        # self.game_font = pygame.font.Font("Fonts/Penisfont.ttf", 16)
