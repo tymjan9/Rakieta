@@ -7,7 +7,7 @@ class Settings:
 
         self.rocket_mass = 3000000
         self.rocket_max_thrust = 35000000
-        self.rocket_max_torque = 10000000
+        self.rocket_max_torque = 100000
         self.rocket_start_postition = [0,0]
         self.rocket_start_velocity = [0,0]
 

@@ -1,4 +1,4 @@
-import pygame, os, sys, json, socket, math
+import pygame, os, sys, json, socket, math, time
 from settings import Settings
 
 
@@ -92,6 +92,8 @@ class Display:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_ESCAPE]:
                 run = False
+            if keys[pygame.K_SPACE]:
+                time.sleep(60)
             if keys[pygame.K_w]:
                 self.up_engine()
             if keys[pygame.K_s]:
