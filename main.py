@@ -74,23 +74,28 @@ class Rocket:
     def rotation_left(self):
         self.side_thrust = self.settings.rocket_max_side_thrust * -1
 
-
     def auto_landing(self):
         if self.positon[1] > 200:
-            if self.velocity[1] > -50:
-                self.thrust = 0
-            else:
-                self.thrust = self.settings.rocket_max_thrust
-        elif self.positon[1] > 10:
-            if self.velocity[1] > -10:
-                self.thrust = 0
-            else:
-                self.thrust = self.settings.rocket_max_thrust
+            self.set_y_speed(-30,10)
         else:
-            if self.velocity[1] < -1:
-                self.thrust = self.settings.rocket_max_thrust
-            if self.velocity[1] > 0:
-                self.thrust = 0
+            self.set_y_speed(-1,0.5)
+
+
+    def set_y_speed(self, target, max_acceleration):
+        if self.velocity[1] > target:
+            self.set_y_acceleration(-max_acceleration)
+        if self.velocity[1] < target:
+            self.set_y_acceleration(max_acceleration)
+
+
+    def set_y_acceleration(self, target):
+        if self.acceleration[1] > target:
+            if self.thrust > 0:
+                self.thrust = self.thrust - self.settings.rocket_max_thrust / 100
+        if self.acceleration[1] < target:
+            if self.thrust < self.settings.rocket_max_thrust:
+                self.thrust = self.thrust + self.settings.rocket_max_thrust / 100
+
 
 
 
