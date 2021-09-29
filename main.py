@@ -60,6 +60,38 @@ class Rocket:
         file.write(f"{self.velocity[0]},{self.velocity[1]};{self.positon[0]},{self.positon[1]}\n")
         file.close()
 
+    def up_engine(self):
+        if self.thrust < self.settings.rocket_max_thrust:
+            self.thrust = self.thrust + self.settings.rocket_max_thrust / 100
+
+    def down_engine(self):
+        if self.thrust > 0:
+            self.thrust = self.thrust - self.settings.rocket_max_thrust / 100
+
+    def rotation_right(self):
+        self.side_thrust = self.settings.rocket_max_side_thrust
+
+    def rotation_left(self):
+        self.side_thrust = self.settings.rocket_max_side_thrust * -1
+
+
+    def auto_landing(self):
+        if self.positon[1] > 200:
+            if self.velocity[1] > -50:
+                self.thrust = 0
+            else:
+                self.thrust = self.settings.rocket_max_thrust
+        elif self.positon[1] > 10:
+            if self.velocity[1] > -10:
+                self.thrust = 0
+            else:
+                self.thrust = self.settings.rocket_max_thrust
+        else:
+            if self.velocity[1] < -1:
+                self.thrust = self.settings.rocket_max_thrust
+            if self.velocity[1] > 0:
+                self.thrust = 0
+
 
 
 class Display:
@@ -97,13 +129,15 @@ class Display:
             if keys[pygame.K_SPACE]:
                 time.sleep(60)
             if keys[pygame.K_w]:
-                self.up_engine()
+                self.rocket.up_engine()
             if keys[pygame.K_s]:
-                self.down_engine()
+                self.rocket.down_engine()
             if keys[pygame.K_a]:
-                self.rotation_left()
+                self.rocket.rotation_left()
             if keys[pygame.K_d]:
-                self.rotation_right()
+                self.rocket.rotation_right()
+            if keys[pygame.K_f]:
+                self.rocket.auto_landing()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -139,19 +173,6 @@ class Display:
 
 
 
-    def up_engine(self):
-        if self.rocket.thrust < self.settings.rocket_max_thrust:
-            self.rocket.thrust = self.rocket.thrust + self.settings.rocket_max_thrust / 100
-        
-    def down_engine(self):
-        if self.rocket.thrust > 0:
-            self.rocket.thrust = self.rocket.thrust - self.settings.rocket_max_thrust / 100
-
-    def rotation_right(self):
-        self.rocket.side_thrust = self.settings.rocket_max_side_thrust
-
-    def rotation_left(self):
-        self.rocket.side_thrust = self.settings.rocket_max_side_thrust * -1
 
 
 
