@@ -76,9 +76,12 @@ class Rocket:
 
     def auto_landing(self):
         if self.positon[1] > 200:
-            self.set_y_speed(-30,10)
+            self.set_y_speed(-50,10)
+        elif self.positon[1] > 30:
+            self.set_y_speed(-2,10)
         else:
-            self.set_y_speed(-1,0.5)
+            self.set_y_speed(-1, 1)
+
 
 
     def set_y_speed(self, target, max_acceleration):
