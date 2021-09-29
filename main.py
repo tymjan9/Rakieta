@@ -15,29 +15,30 @@ class Rocket:
         self.rotational_acceleration = 0
         self.rotational_speed = 0
         self.rotation = 0
-        self.torque = 0
+        self.side_thrust = 0
 
 
     def symulate_next_step(self):
-        self.rotational_acceleration = self.torque / self.settings.rocket_mass
+        # self.rotational_acceleration = self.torque / self.settings.rocket_mass
+        #
+        # self.rotational_speed = self.rotational_speed + self.rotational_acceleration * self.settings.delta_t
+        #
+        # self.rotation = self.rotation + self.rotational_speed * self.settings.delta_t + self.rotational_acceleration * self.settings.delta_t**2 / 2
+        #
+        # if self.rotation > 360:
+        #     self.rotation = self.rotation - 360
+        # if self.rotation < -0:
+        #     self.rotation = 360 - self.rotation
 
-        self.rotational_speed = self.rotational_speed + self.rotational_acceleration * self.settings.delta_t
 
-        self.rotation = self.rotation + self.rotational_speed * self.settings.delta_t + self.rotational_acceleration * self.settings.delta_t**2 / 2
+        # self.acceleration[0] = math.sin(self.rotation) * self.thrust / self.settings.rocket_mass
 
-        if self.rotation > 360:
-            self.rotation = self.rotation - 360
-        if self.rotation < -0:
-            self.rotation = 360 - self.rotation
+        # self.acceleration[1] = math.cos(self.rotation) * self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
 
-
-        self.acceleration[0] = math.sin(self.rotation) * self.thrust / self.settings.rocket_mass
-
-        self.acceleration[1] = math.cos(self.rotation) * self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
         # self.acceleration[1] = self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
 
-        # self.acceleration[0] = 0
-        # self.acceleration[1] = self.settings.gravitational_acceleration + self.thrust / self.settings.rocket_mass
+        self.acceleration[0] = self.side_thrust / self.settings.rocket_mass
+        self.acceleration[1] = self.settings.gravitational_acceleration + self.thrust / self.settings.rocket_mass
 
         self.velocity[0] = self.velocity[0] + self.acceleration[0] * self.settings.delta_t
         self.velocity[1] = self.velocity[1] + self.acceleration[1] * self.settings.delta_t
@@ -89,7 +90,7 @@ class Display:
 
         run = True
         while run:
-            self.rocket.torque = 0
+            self.rocket.side_thrust = 0
             keys = pygame.key.get_pressed()
             if keys[pygame.K_ESCAPE]:
                 run = False
@@ -110,26 +111,27 @@ class Display:
 
             self.rocket.symulate_next_step()
             self.rocket.save_step_to_file()
-            print(self.rocket.acceleration)
 
             self.screen.fill([0,255,255])
             self.screen.blit(self.ground_sprite, [600-self.rocket.positon[0], 450 + self.rocket.positon[1]])
             self.screen.blit(self.ground_sprite, [-9400-self.rocket.positon[0], 450 + self.rocket.positon[1]])
             x, y = 595, 410
             if self.rocket.thrust > 0:
-                rocket = pygame.transform.rotate(self.rocket_fire_sprite, -self.rocket.rotation)
+                rocket = self.rocket_fire_sprite
 
             else:
-                rocket = pygame.transform.rotate(self.rocket_sprite, -self.rocket.rotation)
+                rocket = self.rocket_sprite
             rocket.set_colorkey((0, 0, 255))
             rocket_rect = rocket.get_rect()
             rocket_rect.center = x, y
             self.screen.blit(rocket, rocket_rect)
             self.screen.blit(self.game_font_30.render("Positon: " + (str(round(self.rocket.positon[0],2)) + "m  " + str(round(self.rocket.positon[1],2))) + "m", True, (0,0,0)), [10, 10])
             self.screen.blit(self.game_font_30.render("Velocity: " + (str(round(self.rocket.velocity[0], 2)) + "m/s  " + str(round(self.rocket.velocity[1], 2))) + "m/s", True, (0, 0, 0)), [10, 50])
-            self.screen.blit(self.game_font_30.render("Thrust: " + str(int(self.rocket.thrust/1000)) + "KN", True, (0, 0, 0)), [10, 90])
-            self.screen.blit(self.game_font_30.render("Rotation: " + str(round(self.rocket.rotation, 2)), True, (0, 0, 0)), [10, 130])
-            self.screen.blit(self.game_font_30.render(f"Time: {self.time}s", True, (0,0,0)), [10, 170])
+            self.screen.blit(self.game_font_30.render("Acceleration: " + (str(round(self.rocket.acceleration[0], 2)) + "m/s2  " + str(round(self.rocket.acceleration[1], 2))) + "m/s2", True, (0, 0, 0)), [10, 90])
+            self.screen.blit(self.game_font_30.render("Thrust: " + str(int(self.rocket.thrust/1000)) + "KN", True, (0, 0, 0)), [10, 130])
+            self.screen.blit(self.game_font_30.render("Fuel: " + str(self.settings.fuel), True, (0, 0, 0)), [10, 170])
+            self.screen.blit(self.game_font_30.render("Rotation: " + str(round(self.rocket.rotation, 2)), True, (0, 0, 0)), [10, 210])
+            self.screen.blit(self.game_font_30.render(f"Time: {self.time}s", True, (0,0,0)), [10, 250])
 
             pygame.display.update()
             self.clock.tick(self.settings.game_clock)
@@ -146,10 +148,10 @@ class Display:
             self.rocket.thrust = self.rocket.thrust - self.settings.rocket_max_thrust / 100
 
     def rotation_right(self):
-        self.rocket.torque = self.settings.rocket_max_torque
+        self.rocket.side_thrust = self.settings.rocket_max_side_thrust
 
     def rotation_left(self):
-        self.rocket.torque = self.settings.rocket_max_torque * -1
+        self.rocket.side_thrust = self.settings.rocket_max_side_thrust * -1
 
 
 
