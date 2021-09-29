@@ -33,7 +33,8 @@ class Rocket:
 
         self.acceleration[0] = math.sin(self.rotation) * self.thrust / self.settings.rocket_mass
 
-        self.acceleration[1] = math.cos(self.rotation) * self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
+        # self.acceleration[1] = math.cos(self.rotation) * self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
+        self.acceleration[1] = self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
 
         # self.acceleration[0] = 0
         # self.acceleration[1] = self.settings.gravitational_acceleration + self.thrust / self.settings.rocket_mass
