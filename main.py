@@ -75,10 +75,10 @@ class Rocket:
         self.side_thrust = self.settings.rocket_max_side_thrust * -1
 
     def auto_landing(self):
-        if self.positon[1] > 200:
+        if self.positon[1] > 300:
             self.set_y_speed(-50,10)
-        elif self.positon[1] > 40:
-            self.set_y_speed(-2,10)
+        elif self.positon[1] > 50:
+            self.set_y_speed(-5,8)
         else:
             self.set_y_speed(-1, 1)
 
@@ -127,7 +127,7 @@ class Display:
         self.run_game()
 
     def run_game(self):
-
+        landing = False
         run = True
         while run:
             self.rocket.side_thrust = 0
@@ -145,10 +145,13 @@ class Display:
             if keys[pygame.K_d]:
                 self.rocket.rotation_right()
             if keys[pygame.K_f]:
-                self.rocket.auto_landing()
+                landing = True
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+
+            if landing:
+                self.rocket.auto_landing()
 
 
             self.rocket.symulate_next_step()
