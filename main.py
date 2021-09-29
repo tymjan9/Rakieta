@@ -72,13 +72,12 @@ class Display:
         self.screen = pygame.display.set_mode((1200, 800))
         self.screen_rect = self.screen.get_rect()
 
-        # self.game_font = pygame.font.Font("Fonts/Penisfont.ttf", 50)
-        self.game_font_30 = pygame.font.Font(pygame.font.get_default_font(), 30)
-        self.game_font_15 = pygame.font.Font(pygame.font.get_default_font(), 15)
+#        self.game_font = pygame.font.Font("Fonts/Penisfont.ttf", 50)
+#        self.game_font_15 = pygame.font.Font(pygame.font.get_default_font(), 15)
 
-        self.ground_sprite = pygame.transform.scale(pygame.image.load("images/Ground.png"), (10000,600))
-        self.rocket_sprite = pygame.transform.scale(pygame.image.load("images/Rocket.png"), (10, 120))
-        self.rocket_fire_sprite = pygame.transform.scale(pygame.image.load("images/Rocket_fire.png"), (10, 120))
+        self.ground_sprite = pygame.transform.scale(pygame.image.load("images/Ground.bmp"), (10000,600))
+        self.rocket_sprite = pygame.transform.scale(pygame.image.load("images/Rocket.bmp"), (10, 120))
+        self.rocket_fire_sprite = pygame.transform.scale(pygame.image.load("images/Rocket_fire.bmp"), (10, 120))
 
 
         self.time = 0
@@ -125,11 +124,11 @@ class Display:
             rocket_rect = rocket.get_rect()
             rocket_rect.center = x, y
             self.screen.blit(rocket, rocket_rect)
-            self.screen.blit(self.game_font_30.render("Positon: " + (str(round(self.rocket.positon[0],2)) + "m  " + str(round(self.rocket.positon[1],2))) + "m", True, (0,0,0)), [10, 10])
-            self.screen.blit(self.game_font_30.render("Velocity: " + (str(round(self.rocket.velocity[0], 2)) + "m/s  " + str(round(self.rocket.velocity[1], 2))) + "m/s", True, (0, 0, 0)), [10, 50])
-            self.screen.blit(self.game_font_30.render("Thrust: " + str(int(self.rocket.thrust/1000)) + "KN", True, (0, 0, 0)), [10, 90])
-            self.screen.blit(self.game_font_30.render("Rotation: " + str(round(self.rocket.rotation, 2)), True, (0, 0, 0)), [10, 130])
-            self.screen.blit(self.game_font_30.render(f"Time: {self.time}s", True, (0,0,0)), [10, 170])
+            #self.screen.blit(self.game_font_30.render("Positon: " + (str(round(self.rocket.positon[0],2)) + "m  " + str(round(self.rocket.positon[1],2))) + "m", True, (0,0,0)), [10, 10])
+            #self.screen.blit(self.game_font_30.render("Velocity: " + (str(round(self.rocket.velocity[0], 2)) + "m/s  " + str(round(self.rocket.velocity[1], 2))) + "m/s", True, (0, 0, 0)), [10, 50])
+            #self.screen.blit(self.game_font_30.render("Thrust: " + str(int(self.rocket.thrust/1000)) + "KN", True, (0, 0, 0)), [10, 90])
+            #self.screen.blit(self.game_font_30.render("Rotation: " + str(round(self.rocket.rotation, 2)), True, (0, 0, 0)), [10, 130])
+            #self.screen.blit(self.game_font_30.render(f"Time: {self.time}s", True, (0,0,0)), [10, 170])
 
             pygame.display.update()
             self.clock.tick(self.settings.game_clock)
