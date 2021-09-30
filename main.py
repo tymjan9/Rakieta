@@ -19,24 +19,6 @@ class Rocket:
 
 
     def symulate_next_step(self):
-        # self.rotational_acceleration = self.torque / self.settings.rocket_mass
-        #
-        # self.rotational_speed = self.rotational_speed + self.rotational_acceleration * self.settings.delta_t
-        #
-        # self.rotation = self.rotation + self.rotational_speed * self.settings.delta_t + self.rotational_acceleration * self.settings.delta_t**2 / 2
-        #
-        # if self.rotation > 360:
-        #     self.rotation = self.rotation - 360
-        # if self.rotation < -0:
-        #     self.rotation = 360 - self.rotation
-
-
-        # self.acceleration[0] = math.sin(self.rotation) * self.thrust / self.settings.rocket_mass
-
-        # self.acceleration[1] = math.cos(self.rotation) * self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
-
-        # self.acceleration[1] = self.thrust / self.settings.rocket_mass + self.settings.gravitational_acceleration
-
         self.acceleration[0] = self.side_thrust / self.settings.rocket_mass
         self.acceleration[1] = self.settings.gravitational_acceleration + self.thrust / self.settings.rocket_mass
 
@@ -46,6 +28,8 @@ class Rocket:
         self.positon[0] = self.positon[0] + self.velocity[0] * self.settings.delta_t + self.acceleration[0] * self.settings.delta_t**2 / 2
         self.positon[1] = self.positon[1] + self.velocity[1] * self.settings.delta_t + self.acceleration[1] * self.settings.delta_t ** 2 / 2
 
+        self.velocity[0] = self.velocity[0] * 0.999
+
         if self.positon[1] < 0:
             if self.acceleration[1] < 0:
                 self.acceleration[1] = 0
@@ -53,12 +37,14 @@ class Rocket:
                 self.velocity[1] = 0
             if self.positon[1] < 0:
                 self.positon[1] = 0
+            self.velocity[0] = 0
 
 
     def save_step_to_file(self):
         file = open("logs.elo", "a")
         file.write(f"{self.velocity[0]},{self.velocity[1]};{self.positon[0]},{self.positon[1]}\n")
         file.close()
+
 
     def up_engine(self):
         if self.thrust < self.settings.rocket_max_thrust:
@@ -74,6 +60,27 @@ class Rocket:
     def rotation_left(self):
         self.side_thrust = self.settings.rocket_max_side_thrust * -1
 
+
+    def go_to_landing_pad(self):
+        if self.settings.landing_pad_position > self.positon[0]:
+            self.set_x_speed(10, 2)
+        if self.settings.landing_pad_position < self.positon[0]:
+            self.set_x_speed(-10, 2)
+
+    def set_x_speed(self, target, max_acceleration):
+        if self.velocity[0] > target:
+            self.set_x_acceleration(-max_acceleration)
+        if self.velocity[0] < target:
+            self.set_x_acceleration(max_acceleration)
+
+    def set_x_acceleration(self, target):
+        if self.acceleration[0] > target:
+            if self.side_thrust > -self.settings.rocket_max_side_thrust:
+                self.side_thrust = self.side_thrust - self.settings.rocket_max_side_thrust / 100
+        if self.acceleration[0] < target:
+            if self.side_thrust < self.settings.rocket_max_side_thrust:
+                self.side_thrust = self.side_thrust + self.settings.rocket_max_side_thrust / 100
+
     def auto_landing(self):
         if self.positon[1] > 300:
             self.set_y_speed(-50,10)
@@ -82,14 +89,11 @@ class Rocket:
         else:
             self.set_y_speed(-1, 1)
 
-
-
     def set_y_speed(self, target, max_acceleration):
         if self.velocity[1] > target:
             self.set_y_acceleration(-max_acceleration)
         if self.velocity[1] < target:
             self.set_y_acceleration(max_acceleration)
-
 
     def set_y_acceleration(self, target):
         if self.acceleration[1] > target:
@@ -120,6 +124,7 @@ class Display:
         self.ground_sprite = pygame.transform.scale(pygame.image.load("images/Ground.bmp"), (10000,600))
         self.rocket_sprite = pygame.transform.scale(pygame.image.load("images/Rocket.bmp"), (10, 120))
         self.rocket_fire_sprite = pygame.transform.scale(pygame.image.load("images/Rocket_fire.bmp"), (10, 120))
+        self.landing = pygame.image.load("images/landing.bmp")
 
 
         self.time = 0
@@ -128,6 +133,7 @@ class Display:
 
     def run_game(self):
         landing = False
+        go_to_landing_pad = False
         run = True
         while run:
             self.rocket.side_thrust = 0
@@ -146,12 +152,16 @@ class Display:
                 self.rocket.rotation_right()
             if keys[pygame.K_f]:
                 landing = True
+            if keys[pygame.K_g]:
+                go_to_landing_pad = True
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
 
             if landing:
                 self.rocket.auto_landing()
+            if go_to_landing_pad:
+                self.rocket.go_to_landing_pad()
 
 
             self.rocket.symulate_next_step()
@@ -160,6 +170,7 @@ class Display:
             self.screen.fill([0,255,255])
             self.screen.blit(self.ground_sprite, [600-self.rocket.positon[0], 450 + self.rocket.positon[1]])
             self.screen.blit(self.ground_sprite, [-9400-self.rocket.positon[0], 450 + self.rocket.positon[1]])
+            self.screen.blit(self.landing, (self.settings.landing_pad_position + 600 - 50 - self.rocket.positon[0], 450 + self.rocket.positon[1]))
             x, y = 595, 410
             if self.rocket.thrust > 0:
                 rocket = self.rocket_fire_sprite
