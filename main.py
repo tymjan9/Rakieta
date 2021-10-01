@@ -17,6 +17,8 @@ class Rocket:
         self.rotation = 0
         self.side_thrust = 0
 
+        self.target_y_acceleration = self.settings.gravitational_acceleration
+
 
     def symulate_next_step(self):
         self.acceleration[0] = self.side_thrust / self.settings.rocket_mass
@@ -28,7 +30,6 @@ class Rocket:
         self.positon[0] = self.positon[0] + self.velocity[0] * self.settings.delta_t + self.acceleration[0] * self.settings.delta_t**2 / 2
         self.positon[1] = self.positon[1] + self.velocity[1] * self.settings.delta_t + self.acceleration[1] * self.settings.delta_t ** 2 / 2
 
-        self.velocity[0] = self.velocity[0] * 0.999
 
         if self.positon[1] < 0:
             if self.acceleration[1] < 0:
@@ -62,10 +63,15 @@ class Rocket:
 
 
     def go_to_landing_pad(self):
-        if self.settings.landing_pad_position > self.positon[0]:
-            self.set_x_speed(10, 2)
-        if self.settings.landing_pad_position < self.positon[0]:
-            self.set_x_speed(-10, 2)
+        # if self.settings.landing_pad_position > self.positon[0]:
+        #     self.set_x_speed(10, 2)
+        # if self.settings.landing_pad_position < self.positon[0]:
+        #     self.set_x_speed(-10, 2)
+        speed = (1000 - self.positon[0]) / abs(self.positon[1] * 2 / -self.target_y_acceleration-0.1) ** 0.5
+        if self.positon[0] > self.settings.landing_pad_position:
+            speed = -speed
+        # print(speed)
+        self.set_x_speed(int(speed), 2)
 
     def set_x_speed(self, target, max_acceleration):
         if self.velocity[0] > target:
@@ -96,12 +102,14 @@ class Rocket:
             self.set_y_acceleration(max_acceleration)
 
     def set_y_acceleration(self, target):
+        self.target_y_acceleration = target
         if self.acceleration[1] > target:
             if self.thrust > 0:
                 self.thrust = self.thrust - self.settings.rocket_max_thrust / 100
         if self.acceleration[1] < target:
             if self.thrust < self.settings.rocket_max_thrust:
                 self.thrust = self.thrust + self.settings.rocket_max_thrust / 100
+
 
 
 
