@@ -4,7 +4,7 @@ import os
 
 class Settings:
     def __init__(self):
-        self.fuel = 2550000/2
+        self.fuel = 2550000/10
         self.rocket_mass = 450000 + self.fuel
         self.rocket_max_thrust = 35000000
         self.rocket_max_side_thrust = 5000000

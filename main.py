@@ -87,7 +87,7 @@ class Rocket:
         elif self.positon[1] > 50:
             self.set_y_speed(-5,8)
         else:
-            self.set_y_speed(-1, 1)
+            self.set_y_speed(-2, 1)
 
     def set_y_speed(self, target, max_acceleration):
         if self.velocity[1] > target:
